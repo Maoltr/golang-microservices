@@ -3,7 +3,6 @@ package redisClient
 import (
 	"github.com/go-redis/redis"
 	"sync"
-	"time"
 )
 
 const (
@@ -23,7 +22,6 @@ func GetClient() *redis.Client{
 			Password: password,
 			DB: db,
 		})
-		client.Expire(Channel, time.Duration(time.Hour))
 	})
 
 	return client

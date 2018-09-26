@@ -3,9 +3,9 @@ package consumer
 import (
 	"bitbucket.org/Milinel/golangContainer/models"
 	"bitbucket.org/Milinel/golangContainer/services/consumer"
-	"bitbucket.org/Milinel/golangContainer/services/mqttClient"
+	"bitbucket.org/Milinel/golangContainer/services/natsClient"
 	"encoding/json"
-	"github.com/eclipse/paho.mqtt.golang"
+	"github.com/nats-io/go-nats"
 	"github.com/sirupsen/logrus"
 )
 
@@ -13,27 +13,23 @@ func Listen() {
 	var messageChan chan models.User
 	messageChan = make(chan models.User)
 
-	client, err := mqttClient.GetClient()
+	client, err := natsClient.GetClient()
 	if err != nil {
 		panic(err)
 	}
 
-	client.AddRoute(mqttClient.Topic, func(client mqtt.Client, message mqtt.Message) {
+	client.Subscribe(natsClient.Topic, func(msg *nats.Msg) {
 		var user models.User
 
-		err := json.Unmarshal(message.Payload(), &user)
+		err := json.Unmarshal(msg.Data, &user)
 		if err != nil {
 			logrus.Error(err.Error())
 		}
 
 		messageChan <- user
 	})
-
-	if token := client.Subscribe(mqttClient.Topic, mqttClient.QOS, nil); token.Wait() && token.Error() != nil {
-		logrus.Fatal(token.Error())
-	}
-
-	logrus.Infof("Subscribed to topic: %s", mqttClient.Topic)
+	consumer.TTL()
+	logrus.Infof("Subscribed to topic: %s", natsClient.Topic)
 
 	for {
 		message := <-messageChan

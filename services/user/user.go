@@ -2,29 +2,23 @@ package user
 
 import (
 	"bitbucket.org/Milinel/golangContainer/models"
-	"bitbucket.org/Milinel/golangContainer/services/mqttClient"
+	"bitbucket.org/Milinel/golangContainer/services/natsClient"
 	"bitbucket.org/Milinel/golangContainer/services/redisClient"
 	"encoding/json"
-	"errors"
 	"github.com/go-redis/redis"
 	"github.com/sirupsen/logrus"
 	"time"
 )
 
 func PushJSON(message []byte) error {
-	client, err := mqttClient.GetClient()
+	client, err := natsClient.GetClient()
 	if err != nil {
 		return err
 	}
 
-	token := client.Publish(mqttClient.Topic, mqttClient.QOS, false, message)
-
-	if token.Error() != nil {
-		return token.Error()
-	}
-
-	if !token.Wait() {
-		return errors.New("can not push message into queue")
+	err = client.Publish(natsClient.Topic, message)
+	if err != nil {
+		return err
 	}
 
 	return nil
