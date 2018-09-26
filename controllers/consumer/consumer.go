@@ -1,9 +1,9 @@
-package controllers
+package consumer
 
 import (
 	"bitbucket.org/Milinel/golangContainer/models"
-	"bitbucket.org/Milinel/golangContainer/mqttClient"
-	"bitbucket.org/Milinel/golangContainer/services"
+	"bitbucket.org/Milinel/golangContainer/services/consumer"
+	"bitbucket.org/Milinel/golangContainer/services/mqttClient"
 	"encoding/json"
 	"github.com/eclipse/paho.mqtt.golang"
 	"github.com/sirupsen/logrus"
@@ -37,6 +37,6 @@ func Listen() {
 
 	for {
 		message := <-messageChan
-		services.PushToRedis(message)
+		consumer.PushToRedis(message)
 	}
 }

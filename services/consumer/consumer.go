@@ -1,8 +1,8 @@
-package services
+package consumer
 
 import (
 	"bitbucket.org/Milinel/golangContainer/models"
-	"bitbucket.org/Milinel/golangContainer/redisClient"
+	"bitbucket.org/Milinel/golangContainer/services/redisClient"
 	"encoding/json"
 	"github.com/go-redis/redis"
 	"github.com/pkg/errors"

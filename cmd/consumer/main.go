@@ -1,7 +1,9 @@
 package main
 
-import "bitbucket.org/Milinel/golangContainer/controllers"
+import (
+	"bitbucket.org/Milinel/golangContainer/controllers/consumer"
+)
 
 func main() {
-	controllers.Listen()
+	consumer.Listen()
 }

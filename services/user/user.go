@@ -1,9 +1,9 @@
-package services
+package user
 
 import (
 	"bitbucket.org/Milinel/golangContainer/models"
-	"bitbucket.org/Milinel/golangContainer/mqttClient"
-	"bitbucket.org/Milinel/golangContainer/redisClient"
+	"bitbucket.org/Milinel/golangContainer/services/mqttClient"
+	"bitbucket.org/Milinel/golangContainer/services/redisClient"
 	"encoding/json"
 	"errors"
 	"github.com/go-redis/redis"

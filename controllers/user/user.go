@@ -1,7 +1,8 @@
-package controllers
+package user
 
 import (
-	"bitbucket.org/Milinel/golangContainer/services"
+	"bitbucket.org/Milinel/golangContainer/services/user"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"net/http"
@@ -18,7 +19,7 @@ func PostUser(c *gin.Context) {
 		})
 	}
 
-	err = services.PushJSON(message)
+	err = user.PushJSON(message)
 
 	if err != nil {
 		logrus.Error(err)
@@ -38,27 +39,19 @@ func PostUser(c *gin.Context) {
 }
 
 func GetUsers(c *gin.Context) {
-	period, ok := c.Get("period")
-	if !ok {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"title":   "Incorrect raw",
-			"message": "Enter period please",
-		})
-
-		return
-	}
-
-	duration, err := time.ParseDuration(period.(string))
+	period := c.Param("period")
+	fmt.Println(period)
+	duration, err := time.ParseDuration(period)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"title":   "Incorrect raw",
-			"message": "Enter correct period",
+			"message": "Enter correct period, err: " + err.Error(),
 		})
 
 		return
 	}
 
-	messages, err := services.GetUsers(duration)
+	messages, err := user.GetUsers(duration)
 
 	if err != nil {
 		logrus.Error(err)
