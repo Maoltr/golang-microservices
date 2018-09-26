@@ -32,6 +32,7 @@ func PushJSON(message []byte) error {
 
 func GetUsers(period time.Duration) ([]models.UserUI, error) {
 	client := redisClient.GetClient()
+
 	messages, err := client.ZRangeWithScores(redisClient.Channel, 0, -1).Result()
 	if err != nil {
 		return nil, err

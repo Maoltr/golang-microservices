@@ -2,7 +2,6 @@ package user
 
 import (
 	"bitbucket.org/Milinel/golangContainer/services/user"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"net/http"
@@ -34,13 +33,11 @@ func PostUser(c *gin.Context) {
 		"title":   "Successful",
 		"message": "Successful post user",
 	})
-
-	logrus.Println("Success")
 }
 
 func GetUsers(c *gin.Context) {
 	period := c.Param("period")
-	fmt.Println(period)
+
 	duration, err := time.ParseDuration(period)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
