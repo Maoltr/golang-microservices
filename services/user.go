@@ -37,8 +37,6 @@ func GetUsers(period time.Duration) ([]models.UserUI, error) {
 		return nil, err
 	}
 
-	logrus.Println(messages)
-
 	return sortUsers(period, messages), nil
 }
 

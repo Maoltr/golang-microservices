@@ -23,10 +23,7 @@ func PushToRedis(user models.User) {
 		return
 	}
 
-	cmd := client.ZAdd(redisClient.Channel, redis.Z{Member: messageBytes, Score: float64(message.TimeStamp.Unix())})
-
-	logrus.Println(cmd.Result())
-	logrus.Info(message)
+	client.ZAdd(redisClient.Channel, redis.Z{Member: messageBytes, Score: float64(message.TimeStamp.Unix())})
 }
 
 func prepareMessage(message models.User) (*models.UserUI, error) {
