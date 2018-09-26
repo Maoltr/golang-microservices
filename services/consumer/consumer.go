@@ -25,7 +25,7 @@ func PushToRedis(user models.User) {
 		return
 	}
 
-	oneHourAgo := time.Now().In(time.Local).Truncate(time.Duration(time.Minute))
+	oneHourAgo := time.Now().In(time.Local).Add(-time.Duration(time.Hour))
 	if oneHourAgo.After(message.TimeStamp) {
 		logrus.Error("Old timestamp")
 		return
@@ -40,8 +40,9 @@ func TTL() {
 		ticker := time.NewTicker(time.Minute)
 
 		for range ticker.C {
+			logrus.Info("Tick at: ", time.Now())
 			client := redisClient.GetClient()
-			oneHourAgo := time.Now().In(time.Local).Truncate(time.Duration(time.Hour))
+			oneHourAgo := time.Now().In(time.Local).Add(-time.Duration(time.Hour))
 			client.ZRemRangeByScore(redisClient.Channel, "0", strconv.FormatInt(oneHourAgo.Unix(), 10))
 		}
 	}()
