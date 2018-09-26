@@ -38,7 +38,27 @@ func PostUser(c *gin.Context) {
 }
 
 func GetUsers(c *gin.Context) {
-	messages, err := services.GetUsers(time.Duration(time.Hour*2))
+	period, ok := c.Get("period")
+	if !ok {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"title":   "Incorrect raw",
+			"message": "Enter period please",
+		})
+
+		return
+	}
+
+	duration, err := time.ParseDuration(period.(string))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"title":   "Incorrect raw",
+			"message": "Enter correct period",
+		})
+
+		return
+	}
+
+	messages, err := services.GetUsers(duration)
 
 	if err != nil {
 		logrus.Error(err)
