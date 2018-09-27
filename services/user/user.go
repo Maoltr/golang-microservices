@@ -11,7 +11,7 @@ import (
 )
 
 func PushJSON(message []byte) error {
-	client, err := natsClient.GetClient()
+	client, err := natsClient.GetPublisher()
 	if err != nil {
 		return err
 	}
@@ -47,6 +47,7 @@ func sortUsers(period time.Duration, messages []redis.Z) []models.UserUI {
 		err := json.Unmarshal([]byte(message.Member.(string)), &user)
 		if err != nil {
 			logrus.Error(err.Error())
+			continue
 		}
 
 		start.In(user.TimeStamp.Location())

@@ -6,21 +6,21 @@ import (
 )
 
 const (
-	address = "localhost:6379"
+	address  = "localhost:6379"
 	password = ""
-	db = 0
-	Channel = "users"
+	db       = 0
+	Channel  = "users"
 )
 
 var client *redis.Client
 var once sync.Once
 
-func GetClient() *redis.Client{
+func GetClient() *redis.Client {
 	once.Do(func() {
 		client = redis.NewClient(&redis.Options{
-			Addr: address,
+			Addr:     address,
 			Password: password,
-			DB: db,
+			DB:       db,
 		})
 	})
 

@@ -19,19 +19,7 @@ func PushToRedis(user models.User) {
 
 	client := redisClient.GetClient()
 
-	messageBytes, err := json.Marshal(message)
-	if err != nil {
-		logrus.Error(err.Error())
-		return
-	}
-
-	oneHourAgo := time.Now().In(time.Local).Add(-time.Duration(time.Hour))
-	if oneHourAgo.After(message.TimeStamp) {
-		logrus.Error("Old timestamp")
-		return
-	}
-
-	cmd := client.ZAdd(redisClient.Channel, redis.Z{Member: messageBytes, Score: float64(message.TimeStamp.In(time.Local).Unix())})
+	cmd := client.ZAdd(redisClient.Channel, *message)
 	logrus.Info(cmd.Result())
 }
 
@@ -48,11 +36,24 @@ func TTL() {
 	}()
 }
 
-func prepareMessage(message models.User) (*models.UserUI, error) {
+func prepareMessage(message models.User) (*redis.Z, error) {
 	if message.FirstName == "" || message.LastName == "" {
 		return nil, errors.New("first and last name can't be empty")
 	}
 
 	user := message.TransformUser()
-	return &user, nil
+
+	messageBytes, err := json.Marshal(user)
+	if err != nil {
+		logrus.Error(err.Error())
+		return nil, err
+	}
+
+	oneHourAgo := time.Now().In(time.Local).Add(-time.Duration(time.Hour))
+	if oneHourAgo.After(user.TimeStamp) {
+		logrus.Error("Old timestamp")
+		return nil, errors.New("old timestamp")
+	}
+
+	return &redis.Z{Member: messageBytes, Score: float64(user.TimeStamp.In(time.Local).Unix())}, nil
 }

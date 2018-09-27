@@ -61,7 +61,7 @@ func GetUsers(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"title":   "Successful",
+		"title":    "Successful",
 		"messages": messages,
 	})
 }
