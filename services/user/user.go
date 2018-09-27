@@ -5,7 +5,6 @@ import (
 	"bitbucket.org/Milinel/golangContainer/services/natsClient"
 	"bitbucket.org/Milinel/golangContainer/services/redisClient"
 	"encoding/json"
-	"github.com/go-redis/redis"
 	"github.com/sirupsen/logrus"
 	"time"
 )
@@ -25,9 +24,9 @@ func PushJSON(message []byte) error {
 }
 
 func GetUsers(period time.Duration) ([]models.UserUI, error) {
-	client := redisClient.GetClient()
+	client := redisClient.GetRangeable()
 
-	messages, err := client.ZRangeWithScores(redisClient.Channel, 0, -1).Result()
+	messages, err := client.RangeWithScores(redisClient.Channel, 0, -1).Result()
 	if err != nil {
 		return nil, err
 	}
@@ -35,7 +34,7 @@ func GetUsers(period time.Duration) ([]models.UserUI, error) {
 	return sortUsers(period, messages), nil
 }
 
-func sortUsers(period time.Duration, messages []redis.Z) []models.UserUI {
+func sortUsers(period time.Duration, messages []redisClient.Z) []models.UserUI {
 	var result []models.UserUI
 	start := time.Now()
 

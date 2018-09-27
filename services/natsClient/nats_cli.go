@@ -24,7 +24,7 @@ type Publisher interface {
 	Publish(subj string, data []byte) error
 }
 
-func GetPublisher() (Publisher, error) {
+func getClient() (*nats.Conn, error) {
 	once.Do(func() {
 		client, err = nats.Connect(nats.DefaultURL)
 	})
@@ -37,15 +37,11 @@ func GetPublisher() (Publisher, error) {
 	return client, nil
 }
 
+
+func GetPublisher() (Publisher, error) {
+	return getClient()
+}
+
 func GetSubscriber() (Subscriber, error) {
-	once.Do(func() {
-		client, err = nats.Connect(nats.DefaultURL)
-	})
-
-	if err != nil || !client.IsConnected() {
-		logrus.Fatal(err)
-		return nil, errors.New("no connection to nats")
-	}
-
-	return client, nil
+	return getClient()
 }

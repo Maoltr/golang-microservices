@@ -4,7 +4,6 @@ import (
 	"bitbucket.org/Milinel/golangContainer/models"
 	"bitbucket.org/Milinel/golangContainer/services/redisClient"
 	"encoding/json"
-	"github.com/go-redis/redis"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"strconv"
@@ -15,12 +14,12 @@ func PushToRedis(user models.User) {
 	message, err := prepareMessage(user)
 	if err != nil {
 		logrus.Error(err.Error())
+		return
 	}
 
-	client := redisClient.GetClient()
-
-	cmd := client.ZAdd(redisClient.Channel, *message)
-	logrus.Info(cmd.Result())
+	client := redisClient.GetAddable()
+	cmd := client.Add(redisClient.Channel, *message)
+	logrus.Info(cmd.Err())
 }
 
 func TTL() {
@@ -29,14 +28,14 @@ func TTL() {
 
 		for range ticker.C {
 			logrus.Info("Tick at: ", time.Now())
-			client := redisClient.GetClient()
+			client := redisClient.GetRemovable()
 			oneHourAgo := time.Now().In(time.Local).Add(-time.Duration(time.Hour))
-			client.ZRemRangeByScore(redisClient.Channel, "0", strconv.FormatInt(oneHourAgo.Unix(), 10))
+			client.RemRangeByScore(redisClient.Channel, "0", strconv.FormatInt(oneHourAgo.Unix(), 10))
 		}
 	}()
 }
 
-func prepareMessage(message models.User) (*redis.Z, error) {
+func prepareMessage(message models.User) (*redisClient.Z, error) {
 	if message.FirstName == "" || message.LastName == "" {
 		return nil, errors.New("first and last name can't be empty")
 	}
@@ -51,9 +50,8 @@ func prepareMessage(message models.User) (*redis.Z, error) {
 
 	oneHourAgo := time.Now().In(time.Local).Add(-time.Duration(time.Hour))
 	if oneHourAgo.After(user.TimeStamp) {
-		logrus.Error("Old timestamp")
 		return nil, errors.New("old timestamp")
 	}
 
-	return &redis.Z{Member: messageBytes, Score: float64(user.TimeStamp.In(time.Local).Unix())}, nil
+	return &redisClient.Z{Member: messageBytes, Score: float64(user.TimeStamp.In(time.Local).Unix())}, nil
 }
