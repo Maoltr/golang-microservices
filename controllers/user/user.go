@@ -52,7 +52,7 @@ func GetUsers(c *gin.Context) {
 
 	if err != nil {
 		logrus.Error(err)
-		c.JSON(http.StatusBadRequest, gin.H{
+		c.JSON(http.StatusInternalServerError, gin.H{
 			"title":   "Incorrect raw",
 			"message": err.Error(),
 		})
