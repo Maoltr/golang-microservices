@@ -1,11 +1,11 @@
-package redisClient
+package databaseClient
 
 type Cmd struct {
 	err   error
-	val []Z
+	val []SetMember
 }
 
-func (cmd *Cmd) Result() ([]Z, error){
+func (cmd *Cmd) Result() ([]SetMember, error){
 	return cmd.val, cmd.err
 }
 

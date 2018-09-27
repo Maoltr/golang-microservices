@@ -3,7 +3,7 @@ package user
 import (
 	"bitbucket.org/Milinel/golangContainer/models"
 	"bitbucket.org/Milinel/golangContainer/services/natsClient"
-	"bitbucket.org/Milinel/golangContainer/services/redisClient"
+	"bitbucket.org/Milinel/golangContainer/services/databaseClient"
 	"encoding/json"
 	"github.com/sirupsen/logrus"
 	"time"
@@ -24,9 +24,9 @@ func PushJSON(message []byte) error {
 }
 
 func GetUsers(period time.Duration) ([]models.UserUI, error) {
-	client := redisClient.GetRangeable()
+	client := databaseClient.GetRangeable()
 
-	messages, err := client.RangeWithScores(redisClient.Channel, 0, -1).Result()
+	messages, err := client.RangeWithScores(databaseClient.Channel, 0, -1).Result()
 	if err != nil {
 		return nil, err
 	}
@@ -34,7 +34,7 @@ func GetUsers(period time.Duration) ([]models.UserUI, error) {
 	return sortUsers(period, messages), nil
 }
 
-func sortUsers(period time.Duration, messages []redisClient.Z) []models.UserUI {
+func sortUsers(period time.Duration, messages []databaseClient.SetMember) []models.UserUI {
 	var result []models.UserUI
 	start := time.Now()
 
